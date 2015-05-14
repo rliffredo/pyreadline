@@ -173,8 +173,8 @@ class Console(object):
         return scroll
 
     trtable = {0 : color.Black,      4 : color.DarkRed,  2 : color.DarkGreen,
-               6 : color.DarkYellow, 1 : color.DarkBlue, 5 : color.DarkMagenta,  
-               3 : color.DarkCyan,   7 : color.Gray,     8 : color.DarkGray,   
+               6 : color.DarkYellow, 1 : color.DarkBlue, 5 : color.DarkMagenta,
+               3 : color.DarkCyan,   7 : color.Gray,     8 : color.DarkGray,
                4+8 : color.Red,      2+8 : color.Green,  6+8 : color.Yellow,
                1+8 : color.Blue,     5+8 : color.Magenta,3+8 : color.Cyan,
                7+8 : color.White}
@@ -192,7 +192,7 @@ class Console(object):
         if attr is None: #use attribute from initial console
             attr = self.attr
         fg = attr
-            
+
         for chunk in chunks:
             m = self.escape_parts.match(chunk)
             if m:
@@ -220,7 +220,7 @@ class Console(object):
         self.SetConsoleTextAttribute(self.hout, attr)
         self.WriteConsoleA(self.hout, text, len(text), byref(n), None)
         return len(text)
-        
+
     if "EMACS" in os.environ:
         def write_color(self, text, attr=None):
             junk = c_int(0)
@@ -259,7 +259,7 @@ class Console(object):
         self.write_color(length * " ")
         self.pos(*pos)
         self.WindowTop = oldtop
-        
+
     def rectangle(self, rect, attr=None, fill=' '):
         '''Fill Rectangle.'''
         oldtop = self.WindowTop
@@ -279,7 +279,9 @@ class Console(object):
 
     def scroll(self, rect, dx, dy, attr=None, fill=' '):
         '''Scroll a rectangle.'''
-        raise NotImplementedError
+        x0, y0, x1, y1 = rect
+        System.Console.MoveBufferArea(x0, y0, x1-x0, y1-y0, x0+dx, y0+dy)
+
 
     def scroll_window(self, lines):
         '''Scroll the window by the indicated number of lines.'''
@@ -324,7 +326,7 @@ class Console(object):
             sc.WindowWidth, sc.WindowHeight = width,height
         else:
             return sc.WindowWidth - 1, sc.WindowHeight - 1
-    
+
     def cursor(self, visible=True, size=None):
         '''Set cursor on or off.'''
         System.Console.CursorVisible = visible
