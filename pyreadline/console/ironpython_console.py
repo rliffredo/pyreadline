@@ -280,7 +280,26 @@ class Console(object):
     def scroll(self, rect, dx, dy, attr=None, fill=' '):
         '''Scroll a rectangle.'''
         x0, y0, x1, y1 = rect
-        System.Console.MoveBufferArea(x0, y0, x1-x0, y1-y0, x0+dx, y0+dy)
+
+        # Ensure the destination area is within the console buffer
+        if x0+dx < 0:
+            x0 = x0-dx
+        elif x0+dx > System.Console.BufferWidth:
+            dx = System.Console.BufferWidth-x0-1
+        if y0+dy < 0:
+            y0 = y0-dy
+        elif y0+dy > System.Console.BufferHeight:
+            dy = System.Console.BufferHeight-y0-1
+
+        # We cannot move more than 64k of data, in a structure of 5 bytes;
+        # this means we must split move by small chunks
+        max_y = (64*1024 / (x1-x0) / 5)
+        for yi in range(y0, y1, max_y):
+            yi0 = yi
+            yi1 = yi+max_y
+            if yi1 >= System.Console.BufferHeight:
+                yi1 = System.Console.BufferHeight
+            System.Console.MoveBufferArea(x0, yi0, x1-x0, yi1-yi0, x0+dx, yi0+dy)
 
 
     def scroll_window(self, lines):
