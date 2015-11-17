@@ -293,6 +293,7 @@ class Console(object):
 
         # We cannot move more than 64k of data, in a structure of 5 bytes;
         # this means we must split move by small chunks
+        # See http://stackoverflow.com/questions/1863989 for more details
         max_y = (64*1024 / (x1-x0) / 5)
         for yi in range(y0, y1, max_y):
             yi0 = yi
@@ -300,7 +301,6 @@ class Console(object):
             if yi1 >= System.Console.BufferHeight:
                 yi1 = System.Console.BufferHeight
             System.Console.MoveBufferArea(x0, yi0, x1-x0, yi1-yi0, x0+dx, yi0+dy)
-
 
     def scroll_window(self, lines):
         '''Scroll the window by the indicated number of lines.'''
